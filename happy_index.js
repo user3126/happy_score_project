@@ -366,25 +366,5 @@ function loadQuestion() {
       container.innerHTML =
         `<h2 style='color:#7878ab;'>당신의 행복 점수는 <strong>${totalScore}점</strong> 입니다! </h2>`;
       
-      // 구글 앱 스크립트 연결 
-      fetch(
-        "https://script.google.com/macros/s/AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            score: totalScore, 
-            timestamp: new Date().toISOString(),
-          }),
-        }
-
-      );
     }
     });
-
-
-// AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg 배포 ID
-// https://script.google.com/macros/s/AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg/exec 웹 앱 
