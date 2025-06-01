@@ -285,7 +285,7 @@ const questions = [
       { text: "4회 이상 6회 미만", score: 1.5 },
       { text: "6회 이상 !!", score: 2 },
     ],
-  }
+  },
 ];
 
 let currentQuestionIndex = -1; // 처음은 소개 화면
@@ -303,88 +303,109 @@ questionElem.textContent =
 buttonGroup.style.display = "none";
 nextButton.textContent = "시작하기"; //  버튼 텍스트: 시작하기
 
-
-
 function loadQuestion() {
-    console.log("점수:", totalScore);  
-    
-    const current = questions[currentQuestionIndex];
-    questionElem.textContent = current.question;
-    buttonGroup.innerHTML = "";
-    buttonGroup.style.display = "flex";
-    selectedScore = null;
-    nextButton.disabled = true;
-    nextButton.textContent = "다음"; //  질문부터는 항상 '다음'
+  console.log("점수:", totalScore);
 
-    current.answers.forEach((answer) => {
-        const btn = document.createElement("button");
-        btn.classList.add("score-item");
-        btn.textContent = answer.text;
-        btn.dataset.score = answer.score;
+  const current = questions[currentQuestionIndex];
+  questionElem.textContent = current.question;
+  buttonGroup.innerHTML = "";
+  buttonGroup.style.display = "flex";
+  selectedScore = null;
+  nextButton.disabled = true;
+  nextButton.textContent = "다음"; //  질문부터는 항상 '다음'
 
-        btn.addEventListener("click", () => {
-        selectedScore = answer.score;
+  current.answers.forEach((answer) => {
+    const btn = document.createElement("button");
+    btn.classList.add("score-item");
+    btn.textContent = answer.text;
+    btn.dataset.score = answer.score;
 
-        // 모든 버튼 초기화
-        buttonGroup.querySelectorAll("button").forEach((b) => {
-            b.style.backgroundColor = "#f5f5fa";
-            b.style.color = "#7878ab";
-            b.style.fontWeight = "400";
-        });
+    btn.addEventListener("click", () => {
+      selectedScore = answer.score;
 
-        // 선택한 버튼 강조
-        btn.style.backgroundColor = "#7878ab";
-        btn.style.color = "#fff";
-        btn.style.fontWeight = "700";
+      // 모든 버튼 초기화
+      buttonGroup.querySelectorAll("button").forEach((b) => {
+        b.style.backgroundColor = "#f5f5fa";
+        b.style.color = "#7878ab";
+        b.style.fontWeight = "400";
+      });
 
-        nextButton.disabled = false;
-        });
+      // 선택한 버튼 강조
+      btn.style.backgroundColor = "#7878ab";
+      btn.style.color = "#fff";
+      btn.style.fontWeight = "700";
 
-        buttonGroup.appendChild(btn);
+      nextButton.disabled = false;
     });
-    }
 
-    // 다음 버튼 클릭 시
-    nextButton.addEventListener("click", () => {
-    if (currentQuestionIndex === -1) {
-        // 처음 화면 -> 질문 시작
-        currentQuestionIndex = 0;
-        loadQuestion();
-        return;
-    }
+    buttonGroup.appendChild(btn);
+  });
+}
 
-    if (selectedScore === null) return;
+// 다음 버튼 클릭 시
+nextButton.addEventListener("click", () => {
+  if (currentQuestionIndex === -1) {
+    // 처음 화면 -> 질문 시작
+    currentQuestionIndex = 0;
+    loadQuestion();
+    return;
+  }
 
-    totalScore += selectedScore;
-    currentQuestionIndex++;
+  if (selectedScore === null) return;
 
-    if (currentQuestionIndex < questions.length) {
-        loadQuestion();
+  totalScore += selectedScore;
+  currentQuestionIndex++;
+
+  if (currentQuestionIndex < questions.length) {
+    loadQuestion();
+  } else {
+    console.log("최종 점수:", totalScore);
+
+    // 점수에 따른 결과 멘트 결정
+    let resultTitle = "";
+    let resultMessage = "";
+
+    if (totalScore <= 44) {
+      resultTitle = "다소 낮은 행복 수준";
+      resultMessage =
+        "스트레스나 피로가 누적되어 있는 상태예요. 하루는 밖에 나가 상쾌한 공기를 마시며 재충전의 시간을 가져봐요.";
+    } else if (totalScore <= 64) {
+      resultTitle = "일반적인 행복 수준";
+      resultMessage =
+        "충분히 잘 하고 있어요. 가끔 힘들 때엔 쉬어가며 천천히 나아가도 괜찮아요.";
+    } else if (totalScore <= 79) {
+      resultTitle = "높은 행복 수준";
+      resultMessage =
+        "삶의 여러 측면이 잘 유지되고 있어요. 자기를 잘 돌봐가며 행복한 삶을 계속 이어나가요!";
     } else {
-
-      console.log("최종 점수:", totalScore);
-      container.innerHTML =
-        `<h2 style='color:#7878ab;'>당신의 행복 점수는 <strong>${totalScore}점</strong> 입니다! </h2>`;
-      
-      // 구글 앱 스크립트 연결 
-      fetch(
-        "https://script.google.com/macros/s/AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            score: totalScore, 
-            timestamp: new Date().toISOString(),
-          }),
-        }
-
-      );
+      resultTitle = "아주 높은 행복 수준";
+      resultMessage =
+        "아주 잘 하고 있어요. 그 누구보다도 잘 하고 있으니까, 이대로만 유지할 수 있길 기원할게요.";
     }
-    });
 
+    container.innerHTML = `
+      <h2 style='color:#7878ab;'>당신의 행복 점수는 <strong>${totalScore}점</strong> 입니다!</h2>
+      <h3 style='color:#7878ab; margin-top: 12px;'>${resultTitle}</h3>
+      <p style='color:#7878ab; font-size: 1rem; margin-top: 8px; line-height: 1.6;'>${resultMessage}</p>
+    `;
+
+    // 구글 앱 스크립트 연결
+    fetch(
+      "https://script.google.com/macros/s/AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg/exec",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          score: totalScore,
+          timestamp: new Date().toISOString(),
+        }),
+      }
+    );
+  }
+});
 
 // AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg 배포 ID
 // https://script.google.com/macros/s/AKfycbz_xE64k8TRbVYgpx1jB2dp_VkNnMtbg3M5g5nl8hM26eWVs0rcU2cXlKzHkJBkogmaEg/exec 웹 앱 
